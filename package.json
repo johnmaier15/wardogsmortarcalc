@@ -1,0 +1,17 @@
+{
+  "name": "wardogs-mortar-calc",
+  "version": "0.1.0",
+  "description": "Screenshot-driven mortar calculator for WARDOGS: OCR your coordinates and the target's, get azimuth, range and elevation in mils.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "serve": "http-server . -p 8000 -c-1",
+    "vendor": "node scripts/vendor.mjs"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "tesseract.js": "^5.1.1"
+  }
+}

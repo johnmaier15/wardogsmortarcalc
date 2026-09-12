@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>WARDOGS Mortar Calc</title>
+  <meta name="description" content="Paste screenshots of your position and your target from the WARDOGS tactical map and get azimuth, range and mortar elevation in mils.">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1>WARDOGS Mortar Calc</h1>
+    <p class="tagline">Screenshot the map with the cursor over your gun, then over the target. Paste both here. Dial what it says.</p>
+  </header>
+
+  <main class="layout">
+    <section class="slots">
+      <article class="slot" data-slot="gun" id="slot-gun">
+        <header class="slot-head">
+          <h2>1. Your mortar</h2>
+          <span class="badge" data-role="badge">empty</span>
+        </header>
+        <div class="drop" data-role="drop" tabindex="0" role="button" aria-label="Paste or drop a screenshot of your position">
+          <div class="drop-hint">
+            <strong>Paste</strong> (Ctrl+V) or <strong>drop</strong> a screenshot here<br>
+            <span class="muted">or</span> <button type="button" class="link" data-role="pick">choose a file</button>
+          </div>
+          <div class="preview" data-role="preview" hidden>
+            <canvas data-role="canvas"></canvas>
+            <div class="marquee" data-role="marquee" hidden></div>
+          </div>
+        </div>
+        <input type="file" accept="image/*" data-role="file" hidden>
+        <p class="status" data-role="status">Waiting for a screenshot. Tip: drag a box over the coordinate readout to scan just that area.</p>
+        <div class="coords">
+          <label>X <input type="number" step="0.01" inputmode="decimal" data-role="x" placeholder="85.23"></label>
+          <label>Y <input type="number" step="0.01" inputmode="decimal" data-role="y" placeholder="41.10"></label>
+          <button type="button" class="ghost" data-role="clear" title="Clear this slot">Clear</button>
+        </div>
+        <label class="chatline">Or paste the chat line
+          <input type="text" data-role="chat" placeholder="x85.23, y41.10" autocomplete="off">
+        </label>
+        <details class="raw">
+          <summary>OCR text</summary>
+          <pre data-role="raw"></pre>
+        </details>
+      </article>
+
+      <article class="slot" data-slot="target" id="slot-target">
+        <header class="slot-head">
+          <h2>2. Target</h2>
+          <span class="badge" data-role="badge">empty</span>
+        </header>
+        <div class="drop" data-role="drop" tabindex="0" role="button" aria-label="Paste or drop a screenshot of the target">
+          <div class="drop-hint">
+            <strong>Paste</strong> (Ctrl+V) or <strong>drop</strong> a screenshot here<br>
+            <span class="muted">or</span> <button type="button" class="link" data-role="pick">choose a file</button>
+          </div>
+          <div class="preview" data-role="preview" hidden>
+            <canvas data-role="canvas"></canvas>
+            <div class="marquee" data-role="marquee" hidden></div>
+          </div>
+        </div>
+        <input type="file" accept="image/*" data-role="file" hidden>
+        <p class="status" data-role="status">Waiting for a screenshot.</p>
+        <div class="coords">
+          <label>X <input type="number" step="0.01" inputmode="decimal" data-role="x" placeholder="87.10"></label>
+          <label>Y <input type="number" step="0.01" inputmode="decimal" data-role="y" placeholder="44.65"></label>
+          <button type="button" class="ghost" data-role="clear" title="Clear this slot">Clear</button>
+        </div>
+        <label class="chatline">Or paste the chat line
+          <input type="text" data-role="chat" placeholder="x87.10, y44.65" autocomplete="off">
+        </label>
+        <details class="raw">
+          <summary>OCR text</summary>
+          <pre data-role="raw"></pre>
+        </details>
+      </article>
+    </section>
+
+    <aside class="results" id="results">
+      <header class="slot-head">
+        <h2>3. Fire mission</h2>
+        <label class="weapon">Weapon
+          <select id="weapon"></select>
+        </label>
+      </header>
+
+      <div class="solution" id="solution">
+        <div class="big">
+          <div class="metric">
+            <span class="label">Azimuth</span>
+            <span class="value" id="az">—</span>
+            <span class="sub" id="az-mils"></span>
+          </div>
+          <div class="metric">
+            <span class="label">Elevation</span>
+            <span class="value" id="mil">—</span>
+            <span class="sub" id="mil-alt"></span>
+          </div>
+          <div class="metric">
+            <span class="label">Range</span>
+            <span class="value" id="range">—</span>
+            <span class="sub" id="range-limits"></span>
+          </div>
+        </div>
+        <p class="warn" id="warn" hidden></p>
+        <div class="actions">
+          <button type="button" id="copy">Copy solution</button>
+          <button type="button" class="ghost" id="swap" title="Swap gun and target">Swap</button>
+        </div>
+      </div>
+
+      <details class="correction" id="correction">
+        <summary>Adjust fire after a miss</summary>
+        <p class="muted">Where did the round land, seen from the gun looking at the target?</p>
+        <div class="corr-grid">
+          <label>Long (+) / short (−), m
+            <input type="number" step="1" id="corr-long" value="0">
+          </label>
+          <label>Right (+) / left (−), m
+            <input type="number" step="1" id="corr-right" value="0">
+          </label>
+        </div>
+        <button type="button" id="apply-corr">Shift aim point</button>
+      </details>
+
+      <details class="help">
+        <summary>How to use</summary>
+        <ol>
+          <li>In game, open the tactical map and hover the cursor over your mortar so the X / Y readout shows. Take a screenshot.</li>
+          <li>Paste it into slot 1. The app reads the numbers. If it misreads, drag a box tightly around the coordinate text, or just type the values.</li>
+          <li>Do the same for the target in slot 2. You can also paste a squad-chat line from Mark Coordinates.</li>
+          <li>Set the mortar to the azimuth and elevation shown, fire, then use the miss adjuster for the next round.</li>
+        </ol>
+        <p class="muted">Coordinates: 1.00 = 100 m, so 0.01 = 1 m. Azimuth: 0° north, clockwise. Firing tables are community measurements from the MIT-licensed <a href="https://github.com/apollyon-sys/wardogs-calculator" rel="noopener" target="_blank">wardogs-calculator</a> project and may drift between patches. Unofficial fan project, not affiliated with BULKHEAD.</p>
+      </details>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span id="ocr-state">OCR engine: idle</span>
+    <span>Everything runs in your browser. Screenshots never leave your machine.</span>
+  </footer>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
