@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test",
+    "test": "node --test test/*.test.js",
     "serve": "http-server . -p 8000 -c-1",
     "vendor": "node scripts/vendor.mjs"
   },
