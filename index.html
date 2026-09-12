@@ -90,19 +90,19 @@
       <div class="solution" id="solution">
         <div class="big">
           <div class="metric">
-            <span class="label">Azimuth</span>
+            <span class="label">Azimuth · compass</span>
             <span class="value" id="az">—</span>
             <span class="sub" id="az-mils"></span>
           </div>
           <div class="metric">
-            <span class="label">Elevation</span>
-            <span class="value" id="mil">—</span>
-            <span class="sub" id="mil-alt"></span>
-          </div>
-          <div class="metric">
-            <span class="label">Range</span>
+            <span class="label">Range · dial RNG</span>
             <span class="value" id="range">—</span>
             <span class="sub" id="range-limits"></span>
+          </div>
+          <div class="metric">
+            <span class="label">Elevation · MILS</span>
+            <span class="value" id="mil">—</span>
+            <span class="sub" id="mil-alt"></span>
           </div>
         </div>
         <p class="warn" id="warn" hidden></p>
@@ -132,9 +132,9 @@
           <li>In game, open the tactical map and hover the cursor over your mortar so the X / Y readout shows. Take a screenshot.</li>
           <li>Paste it into slot 1. The app reads the numbers. If it misreads, drag a box tightly around the coordinate text, or just type the values.</li>
           <li>Do the same for the target in slot 2. You can also paste a squad-chat line from Mark Coordinates.</li>
-          <li>Set the mortar to the azimuth and elevation shown, fire, then use the miss adjuster for the next round.</li>
+          <li>In the sight, turn until the compass strip reads the azimuth, then dial <strong>RNG</strong> to the range shown. The sight's MILS readout should land near the elevation figure; RNG is the one to trust. Fire, then use the miss adjuster for the next round.</li>
         </ol>
-        <p class="muted">Coordinates: 1.00 = 100 m, so 0.01 = 1 m. Azimuth: 0° north, clockwise. Firing tables are community measurements from the MIT-licensed <a href="https://github.com/apollyon-sys/wardogs-calculator" rel="noopener" target="_blank">wardogs-calculator</a> project and may drift between patches. Unofficial fan project, not affiliated with BULKHEAD.</p>
+        <p class="muted">Coordinates: 1.00 = 100 m, so 0.01 = 1 m. Azimuth: 0° north, clockwise. Range is straight geometry from the two points. The elevation-in-mils figures are community measurements from the MIT-licensed <a href="https://github.com/apollyon-sys/wardogs-calculator" rel="noopener" target="_blank">wardogs-calculator</a> project and may drift between patches. Unofficial fan project, not affiliated with BULKHEAD.</p>
       </details>
     </aside>
   </main>

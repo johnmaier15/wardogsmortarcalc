@@ -3,6 +3,7 @@
 // Usage: node test/e2e/run.mjs  (needs a static server on :8000)
 import { createRequire } from 'node:module';
 import { mkdirSync, writeFileSync } from 'node:fs';
+import { wardogsMapScreenshot } from './fixtures.mjs';
 const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_MODULE ?? 'playwright');
 
@@ -123,6 +124,23 @@ await page.fill('#slot-target [data-role=chat]', 'x88.00, y41.10');
 check('chat line parsed', (await page.inputValue('#slot-target [data-role=x]')) === '88.00');
 const azEast = await page.textContent('#az');
 check('due east is 90°', azEast === '90.0°', azEast);
+
+// Realistic mortar-view frame: small lowercase two-line readout amid HUD noise.
+const t4 = Date.now();
+const realPng = await wardogsMapScreenshot(gen, 98.44, 110.45);
+writeFileSync(`${OUT}/real.png`, realPng);
+await page.click('#slot-gun [data-role=clear]');
+await page.setInputFiles('#slot-gun [data-role=file]', { name: 'real.png', mimeType: 'image/png', buffer: realPng });
+await page.waitForFunction(() => /^x\d|check|failed|not found/.test(document.querySelector('#slot-gun [data-role=badge]').textContent), null, { timeout: 120000 });
+const rx = await page.inputValue('#slot-gun [data-role=x]');
+const ry = await page.inputValue('#slot-gun [data-role=y]');
+check('realistic mortar-view frame', rx === '98.44' && ry === '110.45', `got x=${rx} y=${ry} in ${Date.now() - t4} ms`);
+const realPng2 = await wardogsMapScreenshot(gen, 101.07, 109.9, { tooltip: false, seed: 7 });
+await page.setInputFiles('#slot-gun [data-role=file]', { name: 'real2.png', mimeType: 'image/png', buffer: realPng2 });
+await page.waitForFunction(() => document.querySelector('#slot-gun [data-role=x]').value !== '98.44', null, { timeout: 120000 });
+const rx2 = await page.inputValue('#slot-gun [data-role=x]');
+const ry2 = await page.inputValue('#slot-gun [data-role=y]');
+check('realistic frame without tooltip', rx2 === '101.07' && ry2 === '109.90', `got x=${rx2} y=${ry2}`);
 
 await page.screenshot({ path: `${OUT}/app.png`, fullPage: true });
 await browser.close();

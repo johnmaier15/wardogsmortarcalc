@@ -237,7 +237,7 @@ class Slot {
     if (c.confidence === 'labelled') {
       this.status(`Read x${formatCoordinate(c.x)}, y${formatCoordinate(c.y)}. Check it against the screenshot.`, 'ok');
     } else {
-      this.status(`Guessed x${formatCoordinate(c.x)}, y${formatCoordinate(c.y)} (no X/Y labels seen). Verify, or drag a box around the readout.`);
+      this.status(`Guessed x${formatCoordinate(c.x)}, y${formatCoordinate(c.y)} (readout not clearly found). Verify, or drag a box around the readout.`);
       this.badge('check', 'warn');
     }
   }
@@ -360,7 +360,7 @@ function render() {
     if (s.solutions.length > 1) {
       out.milAlt.textContent = s.solutions.map(x => `${x.name}: ${Math.round(x.mil)}`).join('  ');
     } else {
-      out.milAlt.textContent = primary.name === 'single' ? 'mil' : `${primary.name} arc`;
+      out.milAlt.textContent = primary.name === 'single' ? 'from table, verify' : `${primary.name} arc`;
     }
     out.solution.classList.add('ready');
     out.copy.disabled = false;
