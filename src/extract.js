@@ -42,14 +42,44 @@ const NUMBERISH = '[+-]?[\\dOoQDlI|iSsBZzGgq]{1,5}(?:[.,،]\\s?[\\dOoQDlI|iSsBZz
 function findLabelled(text, labelClass) {
   // Label, optional separator, then the number. Require the label not to be
   // glued to a preceding letter (so "max" doesn't count as an X label).
-  const re = new RegExp(`(?:^|[^A-Za-z])${labelClass}\\s*[:=.\\-]?\\s*(${NUMBERISH})`, 'g');
+  const re = new RegExp(`(?:^|[^A-Za-z])(${labelClass})(\\s*[:=.\\-]?\\s*)(${NUMBERISH})`, 'g');
   const out = [];
   let m;
   while ((m = re.exec(text)) !== null) {
-    const n = tokenToCoordinate(m[1]);
-    if (n !== null) out.push({ value: n, index: m.index });
+    const raw = m[3];
+    const n = tokenToCoordinate(raw);
+    if (n === null) continue;
+    // Score how much this looks like the game's readout, which is always a
+    // lowercase label glued to a number with two decimals: "x98.44".
+    let score = 0;
+    const hasDecimals = /[.,،]\s?[\dOoQDlI|iSsBZzGgq]{2}$/.test(raw.trim());
+    if (hasDecimals) score += 4;
+    if (m[2] === '') score += 2;                    // label glued to number
+    else if (/^\s*:?\s*$/.test(m[2])) score += 1;   // "X: 85.23" style
+    if (n >= 0 && n <= 170) score += 1;             // inside any WARDOGS map
+    if (/^\d{1,3}$/.test(cleanNumberToken(raw).split('.')[0])) score += 1;
+    out.push({ value: n, index: m.index, score, hasDecimals });
   }
   return out;
+}
+
+/**
+ * Pick the best X/Y pair from labelled candidates. Pairs are scored by
+ * their own format scores plus a bonus for being close together in the
+ * text, since the readout's two lines come out adjacent in reading order
+ * while distractors (compass strip, dial numbers, key hints) sit elsewhere.
+ */
+function bestPair(xs, ys) {
+  let best = null;
+  for (const x of xs) {
+    for (const y of ys) {
+      const gap = Math.abs(x.index - y.index);
+      const proximity = gap <= 20 ? 3 : gap <= 60 ? 2 : gap <= 150 ? 1 : 0;
+      const total = x.score + y.score + proximity;
+      if (!best || total > best.total) best = { x, y, total };
+    }
+  }
+  return best;
 }
 
 /**
@@ -83,7 +113,11 @@ export function extractCoordinates(text) {
   const xs = findLabelled(t, LABEL_X);
   const ys = findLabelled(t, LABEL_Y);
   if (xs.length && ys.length) {
-    return { x: xs[0].value, y: ys[0].value, confidence: 'labelled' };
+    const p = bestPair(xs, ys);
+    // Two two-decimal readings next to each other is the real thing; a pair
+    // without decimals is probably noise and gets flagged for a closer look.
+    const strong = p.x.hasDecimals && p.y.hasDecimals;
+    return { x: p.x.value, y: p.y.value, confidence: strong ? 'labelled' : 'labelled-weak' };
   }
 
   const nums = findNumbers(t);

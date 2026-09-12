@@ -26,9 +26,10 @@ export function getWorker(onProgress) {
         workerBlobURL: false,
         logger: m => onProgress?.(m),
       });
+      // No character whitelist: with one, every other HUD word ("$10,000",
+      // "Zoom") gets forced into x/y/digits and turns into a fake readout.
       await worker.setParameters({
         tessedit_pageseg_mode: PSM.SPARSE_TEXT,
-        tessedit_char_whitelist: '0123456789XYxy:.,- ',
         preserve_interword_spaces: '1',
       });
       return worker;
@@ -141,7 +142,7 @@ export async function findCoordinates(img, rect, extract, onProgress, { shouldSt
     const c = extract(text);
     if (!c) continue;
     if (c.confidence === 'labelled') return { coords: c, text };
-    const rank = c.confidence === 'decimals' ? 2 : 1;
+    const rank = c.confidence === 'labelled-weak' ? 3 : c.confidence === 'decimals' ? 2 : 1;
     if (!best || rank > best.rank) best = { coords: c, text, rank };
   }
   return best ? { coords: best.coords, text: best.text } : { coords: null, text: allText };

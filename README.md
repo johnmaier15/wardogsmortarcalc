@@ -19,8 +19,9 @@ your machine.
    of the same size.
 3. Repeat for **2. Target**. You can also paste a squad-chat line from
    *Mark Coordinates* (`x87.10, y44.65`) into the text field.
-4. Read **3. Fire mission**: azimuth (degrees, and mils), elevation (mils),
-   range. Copy it to chat with one click.
+4. Read **3. Fire mission**: azimuth for the compass strip, range to dial
+   into the sight's RNG readout, and the elevation in mils the sight should
+   then show. Copy it to chat with one click.
 5. After a miss, open *Adjust fire after a miss*, enter how far the round
    landed long/short and left/right, and the aim point shifts for you.
 
